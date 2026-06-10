@@ -66,7 +66,7 @@ class StorageService {
     return list.map((e) => StreamModel.fromJson(e)).toList();
   }
 
-  bool get isDarkMode => _prefs.getBool(AppConstants.keyThemeMode) ?? true;
+  bool get isDarkMode => _prefs.getBool(AppConstants.keyThemeMode) ?? false;
   Future<void> setDarkMode(bool val) =>
       _prefs.setBool(AppConstants.keyThemeMode, val);
 }

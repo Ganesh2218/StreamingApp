@@ -11,16 +11,17 @@ class CreateLiveScreen extends GetView<CreateLiveController> {
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: AppTheme.darkBg,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppTheme.darkBg,
+        backgroundColor: theme.scaffoldBackgroundColor,
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded, color: AppTheme.textPrimary),
+          icon: Icon(Icons.close_rounded, color: theme.colorScheme.onSurface),
           onPressed: Get.back,
         ),
-        title: const Text('Setup Stream',
-            style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w700)),
+        title: Text('Setup Stream',
+            style: TextStyle(color: theme.colorScheme.onSurface, fontWeight: FontWeight.w700)),
         actions: [
           Obx(() => Padding(
                 padding: const EdgeInsets.only(right: 16),
@@ -225,22 +226,28 @@ class _PlatformChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.15) : AppTheme.darkCard,
+          color: isSelected ? color.withOpacity(0.15) : theme.cardColor,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color: isSelected ? color : AppTheme.darkBorder,
+            color: isSelected
+                ? color
+                : (isDark ? AppTheme.darkBorder : AppTheme.lightBorder),
             width: isSelected ? 1.5 : 0.5,
           ),
         ),
         child: Text(label,
             style: TextStyle(
-              color: isSelected ? color : AppTheme.textSecondary,
+              color: isSelected
+                  ? color
+                  : (isDark ? AppTheme.textSecondary : AppTheme.textSecondaryLight),
               fontSize: 12,
               fontWeight: FontWeight.w600,
             )),
@@ -253,14 +260,18 @@ class _SectionLabel extends StatelessWidget {
   final String text;
   const _SectionLabel(this.text);
   @override
-  Widget build(BuildContext context) => Text(
-        text,
-        style: const TextStyle(
-            color: AppTheme.textSecondary,
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.8),
-      );
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    return Text(
+      text,
+      style: TextStyle(
+          color: isDark ? AppTheme.textSecondary : AppTheme.textSecondaryLight,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.8),
+    );
+  }
 }
 
 class _StreamField extends StatelessWidget {
@@ -290,37 +301,21 @@ class _StreamField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
       obscureText: obscureText,
       readOnly: readOnly,
       keyboardType: keyboardType,
-      style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
+      style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14),
       validator: validator,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: Icon(icon, color: AppTheme.textTertiary, size: 18),
+        prefixIcon: Icon(icon, color: isDark ? AppTheme.textTertiary : AppTheme.textTertiaryLight, size: 18),
         suffixIcon: suffixIcon,
-        filled: true,
-        fillColor: AppTheme.darkCard,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.darkBorder),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.darkBorder),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.primaryColor, width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.errorColor),
-        ),
       ),
     );
   }
@@ -333,6 +328,8 @@ class _GradientGoLiveButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return GestureDetector(
       onTap: isLoading ? null : onTap,
       child: Container(
@@ -340,7 +337,9 @@ class _GradientGoLiveButton extends StatelessWidget {
         height: 56,
         decoration: BoxDecoration(
           gradient: isLoading ? null : AppTheme.primaryGradient,
-          color: isLoading ? AppTheme.darkBorder : null,
+          color: isLoading
+              ? (isDark ? AppTheme.darkBorder : AppTheme.lightBorder)
+              : null,
           borderRadius: BorderRadius.circular(16),
           boxShadow: isLoading
               ? null

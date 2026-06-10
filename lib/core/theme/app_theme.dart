@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
@@ -27,9 +28,16 @@ class AppTheme {
   static const Color textTertiary = Color(0xFF6B6B8A);
   static const Color textDisabled = Color(0xFF3D3D5C);
 
-  static const Color lightBg = Color(0xFFF5F5FA);
+  static const Color lightBg = Color(0xFFF8F9FD);
   static const Color lightSurface = Color(0xFFFFFFFF);
   static const Color lightCard = Color(0xFFFFFFFF);
+  static const Color lightBorder = Color(0xFFE2E8F0);
+  static const Color lightDivider = Color(0xFFEDF2F7);
+
+  static const Color textPrimaryLight = Color(0xFF0F172A);
+  static const Color textSecondaryLight = Color(0xFF475569);
+  static const Color textTertiaryLight = Color(0xFF94A3B8);
+  static const Color textDisabledLight = Color(0xFFCBD5E1);
 
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [Color(0xFFFF2D55), Color(0xFFFF6B35)],
@@ -134,7 +142,8 @@ class AppTheme {
         ),
         labelStyle: GoogleFonts.inter(color: textSecondary, fontSize: 14),
         hintStyle: GoogleFonts.inter(color: textTertiary, fontSize: 14),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
       cardTheme: CardThemeData(
         color: darkCard,
@@ -177,10 +186,101 @@ class AppTheme {
         error: errorColor,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
-        onSurface: Color(0xFF0A0A1A),
+        onSurface: textPrimaryLight,
       ),
       scaffoldBackgroundColor: lightBg,
+      cardColor: lightCard,
+      dividerColor: lightDivider,
       textTheme: _buildTextTheme(isLight: true),
+      appBarTheme: AppBarTheme(
+        backgroundColor: lightBg,
+        foregroundColor: textPrimaryLight,
+        elevation: 0,
+        centerTitle: true,
+        titleTextStyle: GoogleFonts.inter(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+          color: textPrimaryLight,
+        ),
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryColor,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          textStyle: GoogleFonts.inter(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: primaryColor,
+          side: const BorderSide(color: primaryColor, width: 1.5),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: lightCard,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: lightBorder),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: lightBorder),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: primaryColor, width: 1.5),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: errorColor),
+        ),
+        labelStyle: GoogleFonts.inter(color: textSecondaryLight, fontSize: 14),
+        hintStyle: GoogleFonts.inter(color: textTertiaryLight, fontSize: 14),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      ),
+      cardTheme: CardThemeData(
+        color: lightCard,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: const BorderSide(color: lightBorder, width: 0.5),
+        ),
+      ),
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: lightSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+      ),
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: lightCard,
+        contentTextStyle:
+            GoogleFonts.inter(color: textPrimaryLight, fontSize: 14),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: lightCard,
+        selectedColor: primaryColor.withOpacity(0.2),
+        labelStyle: GoogleFonts.inter(color: textSecondaryLight, fontSize: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        side: const BorderSide(color: lightBorder),
+      ),
     );
   }
 
@@ -190,35 +290,35 @@ class AppTheme {
 
     return TextTheme(
       displayLarge: GoogleFonts.inter(
-        fontSize: 57, fontWeight: FontWeight.w700, color: bodyColor),
+          fontSize: 57, fontWeight: FontWeight.w700, color: bodyColor),
       displayMedium: GoogleFonts.inter(
-        fontSize: 45, fontWeight: FontWeight.w700, color: bodyColor),
+          fontSize: 45, fontWeight: FontWeight.w700, color: bodyColor),
       displaySmall: GoogleFonts.inter(
-        fontSize: 36, fontWeight: FontWeight.w600, color: bodyColor),
+          fontSize: 36, fontWeight: FontWeight.w600, color: bodyColor),
       headlineLarge: GoogleFonts.inter(
-        fontSize: 32, fontWeight: FontWeight.w700, color: bodyColor),
+          fontSize: 32, fontWeight: FontWeight.w700, color: bodyColor),
       headlineMedium: GoogleFonts.inter(
-        fontSize: 28, fontWeight: FontWeight.w600, color: bodyColor),
+          fontSize: 28, fontWeight: FontWeight.w600, color: bodyColor),
       headlineSmall: GoogleFonts.inter(
-        fontSize: 24, fontWeight: FontWeight.w600, color: bodyColor),
+          fontSize: 24, fontWeight: FontWeight.w600, color: bodyColor),
       titleLarge: GoogleFonts.inter(
-        fontSize: 22, fontWeight: FontWeight.w600, color: bodyColor),
+          fontSize: 22, fontWeight: FontWeight.w600, color: bodyColor),
       titleMedium: GoogleFonts.inter(
-        fontSize: 16, fontWeight: FontWeight.w600, color: bodyColor),
+          fontSize: 16, fontWeight: FontWeight.w600, color: bodyColor),
       titleSmall: GoogleFonts.inter(
-        fontSize: 14, fontWeight: FontWeight.w500, color: bodyColor),
+          fontSize: 14, fontWeight: FontWeight.w500, color: bodyColor),
       bodyLarge: GoogleFonts.inter(
-        fontSize: 16, fontWeight: FontWeight.w400, color: bodyColor),
+          fontSize: 16, fontWeight: FontWeight.w400, color: bodyColor),
       bodyMedium: GoogleFonts.inter(
-        fontSize: 14, fontWeight: FontWeight.w400, color: bodyColor),
+          fontSize: 14, fontWeight: FontWeight.w400, color: bodyColor),
       bodySmall: GoogleFonts.inter(
-        fontSize: 12, fontWeight: FontWeight.w400, color: subColor),
+          fontSize: 12, fontWeight: FontWeight.w400, color: subColor),
       labelLarge: GoogleFonts.inter(
-        fontSize: 14, fontWeight: FontWeight.w600, color: bodyColor),
+          fontSize: 14, fontWeight: FontWeight.w600, color: bodyColor),
       labelMedium: GoogleFonts.inter(
-        fontSize: 12, fontWeight: FontWeight.w500, color: subColor),
+          fontSize: 12, fontWeight: FontWeight.w500, color: subColor),
       labelSmall: GoogleFonts.inter(
-        fontSize: 10, fontWeight: FontWeight.w500, color: subColor),
+          fontSize: 10, fontWeight: FontWeight.w500, color: subColor),
     );
   }
 }

@@ -11,20 +11,32 @@ class AuthScreen extends GetView<AuthController> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+      ),
+    );
+
     final nameCtrl = TextEditingController();
     final emailCtrl = TextEditingController();
     final formKey = GlobalKey<FormState>();
 
     return Scaffold(
-      backgroundColor: AppTheme.darkBg,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
         children: [
           Positioned.fill(
             child: DecoratedBox(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF0A0A1F), Color(0xFF12082E), Color(0xFF0A0A1F)],
+                  colors: isDark
+                      ? const [Color(0xFF0A0A1F), Color(0xFF12082E), Color(0xFF0A0A1F)]
+                      : const [Color(0xFFF8F9FD), Color(0xFFEEF2F6), Color(0xFFF8F9FD)],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -41,7 +53,7 @@ class AuthScreen extends GetView<AuthController> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppTheme.primaryColor.withOpacity(0.3),
+                    AppTheme.primaryColor.withOpacity(isDark ? 0.3 : 0.12),
                     Colors.transparent,
                   ],
                 ),
@@ -58,7 +70,7 @@ class AuthScreen extends GetView<AuthController> {
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppTheme.secondaryColor.withOpacity(0.2),
+                    AppTheme.secondaryColor.withOpacity(isDark ? 0.2 : 0.08),
                     Colors.transparent,
                   ],
                 ),
@@ -89,12 +101,8 @@ class AuthScreen extends GetView<AuthController> {
                         const SizedBox(width: 12),
                         Text(
                           'LiveHub',
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineSmall
-                              ?.copyWith(
+                          style: theme.textTheme.headlineSmall?.copyWith(
                                 fontWeight: FontWeight.w800,
-                                color: Colors.white,
                               ),
                         ),
                       ],
@@ -102,24 +110,21 @@ class AuthScreen extends GetView<AuthController> {
                     const SizedBox(height: 48),
                     Text(
                       'Join the\nStream.',
-                      style: Theme.of(context)
-                          .textTheme
-                          .displaySmall
-                          ?.copyWith(
+                      style: theme.textTheme.displaySmall?.copyWith(
                             fontWeight: FontWeight.w800,
-                            color: Colors.white,
                             height: 1.1,
                           ),
                     ).animate().fadeIn(delay: const Duration(milliseconds: 100), duration: const Duration(milliseconds: 600)).slideY(begin: 0.1),
                     const SizedBox(height: 8),
                     Text(
                       'Go live or watch the world — your choice.',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppTheme.textSecondary,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                            color: isDark ? AppTheme.textSecondary : AppTheme.textSecondaryLight,
                           ),
                     ).animate().fadeIn(delay: const Duration(milliseconds: 200), duration: const Duration(milliseconds: 600)),
                     const SizedBox(height: 48),
                     _buildInputField(
+                      context: context,
                       controller: nameCtrl,
                       label: 'Display Name',
                       hint: 'How should we call you?',
@@ -129,6 +134,7 @@ class AuthScreen extends GetView<AuthController> {
                     ).animate().fadeIn(delay: const Duration(milliseconds: 300), duration: const Duration(milliseconds: 500)),
                     const SizedBox(height: 16),
                     _buildInputField(
+                      context: context,
                       controller: emailCtrl,
                       label: 'Email',
                       hint: 'your@email.com',
@@ -143,8 +149,8 @@ class AuthScreen extends GetView<AuthController> {
                     const SizedBox(height: 28),
                     Text(
                       'I want to…',
-                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                            color: AppTheme.textSecondary,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                            color: isDark ? AppTheme.textSecondary : AppTheme.textSecondaryLight,
                           ),
                     ).animate().fadeIn(delay: const Duration(milliseconds: 400)),
                     const SizedBox(height: 12),
@@ -192,8 +198,8 @@ class AuthScreen extends GetView<AuthController> {
                       child: Text(
                         'By continuing you agree to our Terms of Service\nand Privacy Policy.',
                         textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppTheme.textTertiary,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                              color: isDark ? AppTheme.textTertiary : AppTheme.textTertiaryLight,
                             ),
                       ),
                     ).animate().fadeIn(delay: const Duration(milliseconds: 600)),
@@ -209,6 +215,7 @@ class AuthScreen extends GetView<AuthController> {
   }
 
   Widget _buildInputField({
+    required BuildContext context,
     required TextEditingController controller,
     required String label,
     required String hint,
@@ -216,33 +223,17 @@ class AuthScreen extends GetView<AuthController> {
     TextInputType keyboardType = TextInputType.text,
     String? Function(String?)? validator,
   }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
-      style: const TextStyle(color: AppTheme.textPrimary),
+      style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14),
       validator: validator,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        prefixIcon: Icon(icon, color: AppTheme.textTertiary, size: 20),
-        filled: true,
-        fillColor: AppTheme.darkCard,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.darkBorder),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.darkBorder),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.primaryColor, width: 1.5),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.errorColor),
-        ),
+        prefixIcon: Icon(icon, color: isDark ? AppTheme.textTertiary : AppTheme.textTertiaryLight, size: 20),
       ),
     );
   }
@@ -267,6 +258,8 @@ class _RoleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -275,10 +268,12 @@ class _RoleCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? AppTheme.primaryColor.withOpacity(0.15)
-              : AppTheme.darkCard,
+              : theme.cardColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? AppTheme.primaryColor : AppTheme.darkBorder,
+            color: isSelected
+                ? AppTheme.primaryColor
+                : (isDark ? AppTheme.darkBorder : AppTheme.lightBorder),
             width: isSelected ? 1.5 : 0.5,
           ),
         ),
@@ -286,12 +281,16 @@ class _RoleCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Icon(icon,
-                color: isSelected ? AppTheme.primaryColor : AppTheme.textTertiary,
+                color: isSelected
+                    ? AppTheme.primaryColor
+                    : (isDark ? AppTheme.textTertiary : AppTheme.textTertiaryLight),
                 size: 28),
             const SizedBox(height: 10),
             Text(title,
                 style: TextStyle(
-                  color: isSelected ? Colors.white : AppTheme.textSecondary,
+                  color: isSelected
+                      ? (isDark ? Colors.white : AppTheme.primaryColor)
+                      : theme.colorScheme.onSurface,
                   fontWeight: FontWeight.w700,
                   fontSize: 15,
                 )),
@@ -299,8 +298,8 @@ class _RoleCard extends StatelessWidget {
             Text(subtitle,
                 style: TextStyle(
                   color: isSelected
-                      ? AppTheme.textSecondary
-                      : AppTheme.textTertiary,
+                      ? (isDark ? AppTheme.textSecondary : AppTheme.textSecondaryLight)
+                      : (isDark ? AppTheme.textTertiary : AppTheme.textTertiaryLight),
                   fontSize: 11,
                 )),
           ],
@@ -323,16 +322,18 @@ class _GradientButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return GestureDetector(
       onTap: isLoading ? null : onTap,
       child: Container(
         width: double.infinity,
         height: 56,
         decoration: BoxDecoration(
-          gradient: isLoading
-              ? null
-              : AppTheme.primaryGradient,
-          color: isLoading ? AppTheme.darkBorder : null,
+          gradient: isLoading ? null : AppTheme.primaryGradient,
+          color: isLoading
+              ? (isDark ? AppTheme.darkBorder : AppTheme.lightBorder)
+              : null,
           borderRadius: BorderRadius.circular(16),
           boxShadow: isLoading
               ? null

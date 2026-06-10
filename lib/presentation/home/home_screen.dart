@@ -7,6 +7,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/utils/app_utils.dart';
 import '../../core/widgets/live_badge.dart';
 import '../../core/widgets/viewer_count_widget.dart';
+import '../../core/services/storage_service.dart';
 import 'home_controller.dart';
 
 class HomeScreen extends GetView<HomeController> {
@@ -14,19 +15,29 @@ class HomeScreen extends GetView<HomeController> {
 
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+      ),
+    );
+
     return Scaffold(
-      backgroundColor: AppTheme.darkBg,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: RefreshIndicator(
           color: AppTheme.primaryColor,
-          backgroundColor: AppTheme.darkCard,
+          backgroundColor: theme.cardColor,
           onRefresh: controller.loadStreams,
           child: CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
               _buildAppBar(context),
-              _buildSearchBar(),
+              _buildSearchBar(context),
               _buildFeaturedSection(context),
               _buildLiveSectionHeader(context),
               _buildStreamGrid(context),
@@ -43,6 +54,8 @@ class HomeScreen extends GetView<HomeController> {
   }
 
   Widget _buildAppBar(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
@@ -60,11 +73,23 @@ class HomeScreen extends GetView<HomeController> {
             ),
             const SizedBox(width: 10),
             Text('LiveHub',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: Colors.white,
                     )),
             const Spacer(),
+            IconButton(
+              icon: Icon(
+                isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+                color: theme.colorScheme.onSurface,
+              ),
+              onPressed: () {
+                final storage = Get.find<StorageService>();
+                final newMode = !storage.isDarkMode;
+                storage.setDarkMode(newMode);
+                Get.changeThemeMode(newMode ? ThemeMode.dark : ThemeMode.light);
+              },
+            ),
+            const SizedBox(width: 8),
             Obx(() => _AvatarButton(
                   name: controller.currentUser.value?.name ?? 'User',
                   onTap: () => _showProfileSheet(context),
@@ -75,7 +100,9 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
@@ -83,12 +110,15 @@ class HomeScreen extends GetView<HomeController> {
           onChanged: controller.onSearchChanged,
           textInputAction: TextInputAction.go,
           onSubmitted: controller.joinByChannel,
-          style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
+          style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14),
           decoration: InputDecoration(
             hintText: 'Search, or type a channel to join…',
-            hintStyle: const TextStyle(color: AppTheme.textTertiary, fontSize: 14),
-            prefixIcon: const Icon(Icons.search_rounded,
-                color: AppTheme.textTertiary, size: 20),
+            hintStyle: TextStyle(
+                color: isDark ? AppTheme.textTertiary : AppTheme.textTertiaryLight,
+                fontSize: 14),
+            prefixIcon: Icon(Icons.search_rounded,
+                color: isDark ? AppTheme.textTertiary : AppTheme.textTertiaryLight,
+                size: 20),
             suffixIcon: IconButton(
               icon: const Icon(Icons.login_rounded,
                   color: AppTheme.primaryColor, size: 20),
@@ -97,15 +127,17 @@ class HomeScreen extends GetView<HomeController> {
                   controller.joinByChannel(controller.searchQuery.value),
             ),
             filled: true,
-            fillColor: AppTheme.darkCard,
+            fillColor: theme.cardColor,
             contentPadding: const EdgeInsets.symmetric(vertical: 12),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: AppTheme.darkBorder),
+              borderSide: BorderSide(
+                  color: isDark ? AppTheme.darkBorder : AppTheme.lightBorder),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
-              borderSide: const BorderSide(color: AppTheme.darkBorder),
+              borderSide: BorderSide(
+                  color: isDark ? AppTheme.darkBorder : AppTheme.lightBorder),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(14),
@@ -132,7 +164,7 @@ class HomeScreen extends GetView<HomeController> {
                 const SizedBox(width: 8),
                 Text('Featured',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.white, fontWeight: FontWeight.w700)),
+                          fontWeight: FontWeight.w700)),
               ]),
             ),
             SizedBox(
@@ -157,6 +189,8 @@ class HomeScreen extends GetView<HomeController> {
   }
 
   Widget _buildLiveSectionHeader(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return SliverToBoxAdapter(
       child: Obx(() => Padding(
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
@@ -165,14 +199,12 @@ class HomeScreen extends GetView<HomeController> {
                 const LiveBadge(),
                 const SizedBox(width: 8),
                 Text('Live Now',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.white, fontWeight: FontWeight.w700)),
+                    style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700)),
                 const Spacer(),
                 Text('${controller.filteredStreams.length} streams',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: AppTheme.textTertiary)),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                        color: isDark ? AppTheme.textTertiary : AppTheme.textTertiaryLight)),
               ],
             ),
           )),
@@ -220,9 +252,11 @@ class HomeScreen extends GetView<HomeController> {
   }
 
   void _showProfileSheet(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.darkSurface,
+      backgroundColor: theme.colorScheme.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -235,21 +269,21 @@ class HomeScreen extends GetView<HomeController> {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                    color: AppTheme.darkBorder,
+                    color: isDark ? AppTheme.darkBorder : AppTheme.lightBorder,
                     borderRadius: BorderRadius.circular(2))),
             const SizedBox(height: 24),
             Obx(() => Text(
                   controller.currentUser.value?.name ?? '',
-                  style: const TextStyle(
-                      color: AppTheme.textPrimary,
+                  style: TextStyle(
+                      color: theme.colorScheme.onSurface,
                       fontSize: 18,
                       fontWeight: FontWeight.w700),
                 )),
             const SizedBox(height: 4),
             Obx(() => Text(
                   controller.currentUser.value?.email ?? '',
-                  style: const TextStyle(
-                      color: AppTheme.textSecondary, fontSize: 14),
+                  style: TextStyle(
+                      color: isDark ? AppTheme.textSecondary : AppTheme.textSecondaryLight, fontSize: 14),
                 )),
             const SizedBox(height: 8),
             Obx(() => Container(
@@ -397,7 +431,11 @@ class _StreamCard extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: AppTheme.darkBorder, width: 0.5),
+          border: Border.all(
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? AppTheme.darkBorder
+                  : AppTheme.lightBorder,
+              width: 0.5),
         ),
         child: Stack(children: [
           Positioned.fill(
@@ -559,19 +597,21 @@ class _SectionPulse extends StatelessWidget {
 class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(top: 60),
       child: Column(children: [
-        const Icon(Icons.live_tv_outlined, color: AppTheme.textTertiary, size: 64),
+        Icon(Icons.live_tv_outlined, color: isDark ? AppTheme.textTertiary : AppTheme.textTertiaryLight, size: 64),
         const SizedBox(height: 16),
         Text('No streams found',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppTheme.textSecondary,
+            style: theme.textTheme.titleMedium?.copyWith(
+                  color: isDark ? AppTheme.textSecondary : AppTheme.textSecondaryLight,
                 )),
         const SizedBox(height: 8),
         Text('Try a different search term',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppTheme.textTertiary,
+            style: theme.textTheme.bodySmall?.copyWith(
+                  color: isDark ? AppTheme.textTertiary : AppTheme.textTertiaryLight,
                 )),
       ]),
     );
