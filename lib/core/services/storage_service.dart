@@ -4,7 +4,7 @@ import '../../data/models/stream_model.dart';
 import '../../data/models/user_model.dart';
 import '../constants/app_constants.dart';
 
-/// Local persistence layer using SharedPreferences (Web-stable alternative to GetStorage)
+/// Local persistence for the user, saved streams, and app settings.
 class StorageService {
   static final StorageService _instance = StorageService._();
   factory StorageService() => _instance;
@@ -12,11 +12,11 @@ class StorageService {
 
   late final SharedPreferences _prefs;
 
+  /// Must be called once before any read/write.
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
   }
 
-  // ─── User ─────────────────────────────────────────────────
   Future<void> saveUser(UserModel user) =>
       _prefs.setString(AppConstants.keyUser, jsonEncode(user.toJson()));
 
@@ -30,7 +30,6 @@ class StorageService {
 
   bool get isLoggedIn => _prefs.containsKey(AppConstants.keyUser);
 
-  // ─── Stream Configs ──────────────────────────────────────
   Future<void> saveStreamConfig(StreamModel stream) async {
     final list = getStreamConfigs();
     final idx = list.indexWhere((s) => s.id == stream.id);
@@ -56,7 +55,6 @@ class StorageService {
         jsonEncode(list.map((s) => s.toJson()).toList()));
   }
 
-  // ─── Active Streams (mock "server") ──────────────────────
   Future<void> saveActiveStreams(List<StreamModel> streams) =>
       _prefs.setString(AppConstants.keyStreams,
           jsonEncode(streams.map((s) => s.toJson()).toList()));
@@ -68,7 +66,6 @@ class StorageService {
     return list.map((e) => StreamModel.fromJson(e)).toList();
   }
 
-  // ─── Theme ───────────────────────────────────────────────
   bool get isDarkMode => _prefs.getBool(AppConstants.keyThemeMode) ?? true;
   Future<void> setDarkMode(bool val) =>
       _prefs.setBool(AppConstants.keyThemeMode, val);

@@ -24,11 +24,10 @@ class AudienceLiveScreen extends GetView<AudienceLiveController> {
       child: Scaffold(
         backgroundColor: Colors.black,
         body: Stack(
+          fit: StackFit.expand,
           children: [
-            // ── Remote Video ─────────────────────────────────
             _RemoteVideoView(controller: controller),
 
-            // ── Gradient overlay ─────────────────────────────
             Positioned.fill(
               child: DecoratedBox(
                 decoration: BoxDecoration(
@@ -37,13 +36,10 @@ class AudienceLiveScreen extends GetView<AudienceLiveController> {
               ),
             ),
 
-            // ── Top bar ──────────────────────────────────────
             _TopBar(controller: controller),
 
-            // ── Right reactions ───────────────────────────────
             _RightReactions(),
 
-            // ── Bottom: Chat + Controls ───────────────────────
             _BottomSection(controller: controller, chatCtrl: chatCtrl),
           ],
         ),
@@ -52,7 +48,6 @@ class AudienceLiveScreen extends GetView<AudienceLiveController> {
   }
 }
 
-// ─── Remote Video ─────────────────────────────────────────────
 class _RemoteVideoView extends StatelessWidget {
   final AudienceLiveController controller;
   const _RemoteVideoView({required this.controller});
@@ -68,7 +63,10 @@ class _RemoteVideoView extends StatelessWidget {
 
       final users = controller.remoteUsers;
       if (users.isEmpty) {
-        return _WaitingView(stream: controller.stream);
+        return _WaitingView(
+          stream: controller.stream,
+          hasEnded: controller.hasEnded.value,
+        );
       }
       return AgoraVideoView(
         controller: VideoViewController.remote(
@@ -83,22 +81,26 @@ class _RemoteVideoView extends StatelessWidget {
   }
 }
 
-// ─── Waiting view when no host is broadcasting ────────────────
 class _WaitingView extends StatelessWidget {
   final dynamic stream;
-  const _WaitingView({required this.stream});
+  final bool hasEnded;
+  const _WaitingView({required this.stream, this.hasEnded = false});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       color: AppTheme.darkBg,
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        const SizedBox(
-          width: 50,
-          height: 50,
-          child: CircularProgressIndicator(
-              color: AppTheme.primaryColor, strokeWidth: 2),
-        ),
+        if (hasEnded)
+          const Icon(Icons.live_tv_rounded,
+              color: AppTheme.textSecondary, size: 56)
+        else
+          const SizedBox(
+            width: 50,
+            height: 50,
+            child: CircularProgressIndicator(
+                color: AppTheme.primaryColor, strokeWidth: 2),
+          ),
         const SizedBox(height: 20),
         Text(stream?.hostName ?? 'Host',
             style: const TextStyle(
@@ -106,14 +108,28 @@ class _WaitingView extends StatelessWidget {
                 fontSize: 18,
                 fontWeight: FontWeight.w700)),
         const SizedBox(height: 8),
-        const Text('Waiting for stream to start…',
-            style: TextStyle(color: AppTheme.textSecondary, fontSize: 14)),
+        Text(
+            hasEnded
+                ? 'Stream has ended'
+                : 'Waiting for stream to start…',
+            style: const TextStyle(
+                color: AppTheme.textSecondary, fontSize: 14)),
+        if (hasEnded) ...[
+          const SizedBox(height: 24),
+          TextButton(
+            onPressed: Get.back,
+            child: const Text('Close',
+                style: TextStyle(
+                    color: AppTheme.primaryColor,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600)),
+          ),
+        ],
       ]),
     );
   }
 }
 
-// ─── Top Bar ─────────────────────────────────────────────────
 class _TopBar extends StatelessWidget {
   final AudienceLiveController controller;
   const _TopBar({required this.controller});
@@ -126,7 +142,6 @@ class _TopBar extends StatelessWidget {
       right: 16,
       child: Row(
         children: [
-          // Host info
           Flexible(
             flex: 3,
             child: ConstrainedBox(
@@ -177,7 +192,6 @@ class _TopBar extends StatelessWidget {
           Obx(() => ViewerCountWidget(
               count: controller.viewerCount.value, compact: true)),
           const SizedBox(width: 10),
-          // Close
           GestureDetector(
             onTap: Get.back,
             child: Container(
@@ -197,7 +211,6 @@ class _TopBar extends StatelessWidget {
   }
 }
 
-// ─── Right Reaction Buttons ───────────────────────────────────
 class _RightReactions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -231,7 +244,6 @@ class _RightReactions extends StatelessWidget {
   }
 }
 
-// ─── Bottom Section (Chat + Input) ───────────────────────────
 class _BottomSection extends StatelessWidget {
   final AudienceLiveController controller;
   final TextEditingController chatCtrl;
@@ -255,7 +267,6 @@ class _BottomSection extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Chat messages
             SizedBox(
               height: 200,
               child: Obx(() => ListView.builder(
@@ -321,7 +332,6 @@ class _BottomSection extends StatelessWidget {
                   )),
             ),
 
-            // Input row
             Padding(
               padding: EdgeInsets.fromLTRB(
                   16, 8, 16, MediaQuery.of(context).padding.bottom + 16),

@@ -6,7 +6,6 @@ import '../host_live/host_live_controller.dart';
 import '../audience_live/audience_live_controller.dart';
 import '../../core/services/agora_service.dart';
 
-/// Auth screen binding
 class AuthBinding extends Bindings {
   @override
   void dependencies() {
@@ -14,7 +13,6 @@ class AuthBinding extends Bindings {
   }
 }
 
-/// Home screen binding
 class HomeBinding extends Bindings {
   @override
   void dependencies() {
@@ -22,7 +20,6 @@ class HomeBinding extends Bindings {
   }
 }
 
-/// Create live screen binding
 class CreateLiveBinding extends Bindings {
   @override
   void dependencies() {
@@ -30,11 +27,9 @@ class CreateLiveBinding extends Bindings {
   }
 }
 
-/// Host live screen binding – ensures AgoraService is available
 class HostLiveBinding extends Bindings {
   @override
   void dependencies() {
-    // AgoraService is a permanent service, ensure it's ready
     if (!Get.isRegistered<AgoraService>()) {
       Get.put<AgoraService>(AgoraService(), permanent: true);
     }
@@ -42,7 +37,6 @@ class HostLiveBinding extends Bindings {
   }
 }
 
-/// Audience live screen binding
 class AudienceLiveBinding extends Bindings {
   @override
   void dependencies() {

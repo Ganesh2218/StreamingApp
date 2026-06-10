@@ -1,23 +1,45 @@
+import '../../core/constants/app_constants.dart';
 import '../../core/services/storage_service.dart';
 import '../models/stream_model.dart';
 import 'package:uuid/uuid.dart';
 
-/// Local datasource that wraps StorageService with mock seed data
+/// Provides the home feed from local storage, with demo seed data and a
+/// test tile that joins the host's real channel.
 class LocalStreamDatasource {
   final StorageService _storage;
   final _uuid = const Uuid();
 
   LocalStreamDatasource(this._storage);
 
+  /// Returns saved streams (seeding demo data on first run) plus the test tile.
   List<StreamModel> getAllStreams() {
     var streams = _storage.getActiveStreams();
     if (streams.isEmpty) {
-      // Seed demo live streams for the home feed
       streams = _seedStreams();
       _storage.saveActiveStreams(streams);
     }
+    // Test tile joins the host's actual Agora channel.
+    if (AppConstants.useTestChannel &&
+        !streams.any((s) => s.channelName == AppConstants.testChannelName)) {
+      streams = [_testStream(), ...streams];
+    }
     return streams;
   }
+
+  StreamModel _testStream() => StreamModel(
+        id: 'test-stream',
+        title: '🔴 TEST – Join My Live Channel',
+        description: 'Tap to watch the host broadcasting on "$testChan".',
+        channelName: AppConstants.testChannelName,
+        hostId: 'host-test',
+        hostName: 'Test Host',
+        status: StreamStatus.live,
+        viewerCount: 1,
+        isFeatured: true,
+        startedAt: DateTime.now(),
+      );
+
+  static String get testChan => AppConstants.testChannelName;
 
   StreamModel? getStreamById(String id) {
     return getAllStreams().firstWhereOrNull((s) => s.id == id);
@@ -39,7 +61,6 @@ class LocalStreamDatasource {
     _storage.saveActiveStreams(streams);
   }
 
-  // ─── Seed Data ───────────────────────────────────────────
   List<StreamModel> _seedStreams() => [
         StreamModel(
           id: _uuid.v4(),

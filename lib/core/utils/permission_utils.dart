@@ -3,13 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:get/get.dart';
 
-/// Utility to request camera + microphone permissions before going live
 class PermissionUtils {
   PermissionUtils._();
 
-  /// Returns true only if BOTH camera and mic are granted.
   static Future<bool> requestCameraAndMic() async {
-    if (kIsWeb) return true; // Browsers handle this natively when stream starts
+    if (kIsWeb) return true;
 
     final statuses = await [
       Permission.camera,
@@ -36,7 +34,6 @@ class PermissionUtils {
     return true;
   }
 
-  /// Requests only microphone permission (for audience joining with audio).
   static Future<bool> requestMicrophone() async {
     if (kIsWeb) return true;
     final status = await Permission.microphone.request();
@@ -50,7 +47,6 @@ class PermissionUtils {
     return true;
   }
 
-  /// Opens app settings if the user permanently denied a permission.
   static Future<void> openSettings() => openAppSettings();
 
   static void _showDeniedSnack(String title, String message) {

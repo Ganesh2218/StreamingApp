@@ -20,7 +20,6 @@ class AuthScreen extends GetView<AuthController> {
       backgroundColor: AppTheme.darkBg,
       body: Stack(
         children: [
-          // ── Gradient background ───────────────────────────
           Positioned.fill(
             child: DecoratedBox(
               decoration: const BoxDecoration(
@@ -32,7 +31,6 @@ class AuthScreen extends GetView<AuthController> {
               ),
             ),
           ),
-          // ── Glow orb ─────────────────────────────────────
           Positioned(
             top: -80,
             left: -60,
@@ -67,7 +65,6 @@ class AuthScreen extends GetView<AuthController> {
               ),
             ),
           ),
-          // ── Content ──────────────────────────────────────
           SafeArea(
             child: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
@@ -77,7 +74,6 @@ class AuthScreen extends GetView<AuthController> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 40),
-                    // Logo
                     Row(
                       children: [
                         Container(
@@ -123,7 +119,6 @@ class AuthScreen extends GetView<AuthController> {
                           ),
                     ).animate().fadeIn(delay: const Duration(milliseconds: 200), duration: const Duration(milliseconds: 600)),
                     const SizedBox(height: 48),
-                    // Name field
                     _buildInputField(
                       controller: nameCtrl,
                       label: 'Display Name',
@@ -133,7 +128,6 @@ class AuthScreen extends GetView<AuthController> {
                           (v == null || v.trim().isEmpty) ? 'Name is required' : null,
                     ).animate().fadeIn(delay: const Duration(milliseconds: 300), duration: const Duration(milliseconds: 500)),
                     const SizedBox(height: 16),
-                    // Email field
                     _buildInputField(
                       controller: emailCtrl,
                       label: 'Email',
@@ -147,7 +141,6 @@ class AuthScreen extends GetView<AuthController> {
                       },
                     ).animate().fadeIn(delay: const Duration(milliseconds: 350), duration: const Duration(milliseconds: 500)),
                     const SizedBox(height: 28),
-                    // Role selection
                     Text(
                       'I want to…',
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
@@ -183,7 +176,6 @@ class AuthScreen extends GetView<AuthController> {
                           ],
                         )).animate().fadeIn(delay: const Duration(milliseconds: 450)),
                     const SizedBox(height: 36),
-                    // Login button
                     Obx(() => _GradientButton(
                           label: controller.isLoading.value
                               ? 'Joining…'

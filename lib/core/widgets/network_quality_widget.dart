@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
-/// Shows network quality as colored signal bars (0 = excellent, 6 = no signal)
 class NetworkQualityWidget extends StatelessWidget {
-  final int quality; // 0–6
+  final int quality;
   const NetworkQualityWidget({super.key, required this.quality});
 
   Color get _color {

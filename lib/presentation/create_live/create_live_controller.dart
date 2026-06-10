@@ -8,6 +8,7 @@ import '../../core/services/storage_service.dart';
 import '../../core/utils/app_utils.dart';
 import 'package:uuid/uuid.dart';
 
+/// Drives the stream setup form: title, channel, platform, and RTMP details.
 class CreateLiveController extends GetxController {
   final StorageService _storage = Get.find<StorageService>();
 
@@ -24,7 +25,7 @@ class CreateLiveController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    // Auto-fill RTMP URL when platform changes
+    // Fill the RTMP URL automatically based on the chosen platform.
     ever(selectedPlatform, (p) {
       switch (p) {
         case StreamPlatform.youtube:
@@ -39,13 +40,15 @@ class CreateLiveController extends GetxController {
       }
     });
     rtmpUrlController.text = AppConstants.youtubeLiveRtmpBase;
-    // Auto-generate a channel name
-    channelController.text = 'livehub-${const Uuid().v4().substring(0, 8)}';
+    channelController.text = AppConstants.useTestChannel
+        ? AppConstants.testChannelName
+        : 'livehub-${const Uuid().v4().substring(0, 8)}';
   }
 
   void selectPlatform(StreamPlatform p) => selectedPlatform.value = p;
   void toggleShowKey() => showStreamKey.value = !showStreamKey.value;
 
+  /// Validates the form, saves the stream, and opens the host screen.
   Future<void> startLive(GlobalKey<FormState> formKey) async {
     if (!formKey.currentState!.validate()) return;
 

@@ -4,7 +4,6 @@ import '../../data/models/stream_model.dart';
 import '../../data/models/user_model.dart';
 import '../datasource/local_stream_datasource.dart';
 
-/// Concrete stream repository – bridges domain ↔ local datasource
 class StreamRepositoryImpl implements StreamRepository {
   final LocalStreamDatasource _local;
   final _uuid = const Uuid();
@@ -61,7 +60,6 @@ class StreamRepositoryImpl implements StreamRepository {
   }
 }
 
-/// Concrete user repository
 class UserRepositoryImpl implements UserRepository {
   final _localUser = <String, UserModel>{};
   UserModel? _currentUser;

@@ -2,7 +2,6 @@ import '../../data/models/stream_model.dart';
 import '../../data/models/user_model.dart';
 import '../repositories/stream_repository.dart';
 
-// ─── Stream Use Cases ────────────────────────────────────────
 class GetLiveStreamsUseCase {
   final StreamRepository _repo;
   GetLiveStreamsUseCase(this._repo);

@@ -3,22 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-// share_plus is optional — sharing uses Get.snackbar for now
 import '../../core/services/agora_service.dart';
-// import '../../core/services/storage_service.dart';
 import '../../core/utils/permission_utils.dart';
 import '../../data/models/stream_model.dart';
-// // import '../../core/constants/app_constants.dart';
 import '../../core/utils/app_utils.dart';
 
-/// Drives the entire host live screen state
+/// Drives the host screen: starting/ending the live stream, RTMP push,
+/// and camera/mic controls.
 class HostLiveController extends GetxController {
   late final AgoraService _agora;
-// late final StorageService _storage;
 
   StreamModel? stream;
 
-  // ─── Observable state ────────────────────────────────────────
   final streamStatus = StreamStatus.offline.obs;
   final isStarted = false.obs;
   final showControls = true.obs;
@@ -28,7 +24,6 @@ class HostLiveController extends GetxController {
   final errorMessage = ''.obs;
   final elapsedDisplay = '00:00'.obs;
 
-  // Passthrough to AgoraService observables
   RxBool get localVideoEnabled => _agora.localVideoEnabled;
   RxBool get localAudioEnabled => _agora.localAudioEnabled;
   RxBool get isFrontCamera => _agora.isFrontCamera;
@@ -36,7 +31,6 @@ class HostLiveController extends GetxController {
   RtmpPushStatus get rtmpPushStatus => _agora.rtmpStatus.value;
   AgoraService get agora => _agora;
 
-  // ─── Timer ───────────────────────────────────────────────────
   final _timer = StopWatchTimer(mode: StopWatchMode.countUp);
   Timer? _controlsTimer;
 
@@ -44,10 +38,8 @@ class HostLiveController extends GetxController {
   void onInit() {
     super.onInit();
     _agora = Get.find<AgoraService>();
-    // _storage = Get.find<StorageService>();
     stream = Get.arguments as StreamModel?;
 
-    // Mirror agora viewer count
     ever(_agora.viewerCount, (v) => viewerCount.value = v);
     ever(_agora.networkQuality, (q) => networkQuality.value = q);
     ever(_agora.rtmpStatus, (s) => _onRtmpStatus(s));
@@ -58,7 +50,7 @@ class HostLiveController extends GetxController {
     });
   }
 
-  // ─── Start Live ──────────────────────────────────────────────
+  /// Requests permissions and joins the channel as the host.
   Future<void> startLive() async {
     if (stream == null) return;
 
@@ -79,7 +71,7 @@ class HostLiveController extends GetxController {
     }
   }
 
-  // ─── End Live ────────────────────────────────────────────────
+  /// Confirms, stops RTMP, leaves the channel, and exits the screen.
   Future<void> endLive() async {
     if (!isStarted.value) {
       Get.back();
@@ -92,7 +84,6 @@ class HostLiveController extends GetxController {
     );
     if (confirm != true) return;
 
-    // Stop RTMP if streaming
     if (stream?.fullRtmpUrl.isNotEmpty == true) {
       await _agora.stopRtmpPush(stream!.fullRtmpUrl);
     }
@@ -109,7 +100,7 @@ class HostLiveController extends GetxController {
     Get.back();
   }
 
-  // ─── RTMP ────────────────────────────────────────────────────
+  /// Starts RTMP restreaming if the host configured an RTMP URL + key.
   Future<void> _startRtmpIfConfigured() async {
     final url = stream?.fullRtmpUrl ?? '';
     if (url.isEmpty) return;
@@ -122,7 +113,6 @@ class HostLiveController extends GetxController {
     await _agora.startRtmpPush(url);
   }
 
-  // ─── Controls ────────────────────────────────────────────────
   Future<void> toggleCamera() => _agora.toggleCamera();
   Future<void> toggleMic() => _agora.toggleMic();
   Future<void> switchCamera() => _agora.switchCamera();
@@ -145,17 +135,14 @@ class HostLiveController extends GetxController {
     });
   }
 
-  // ─── Share ───────────────────────────────────────────────────
   void shareStream() {
     if (stream == null) return;
-    // share_plus might not be in pubspec; use Get.snackbar fallback
     final msg =
         '🔴 Watching "${stream!.title}" LIVE on LiveHub!\nJoin channel: ${stream!.channelName}';
     Get.snackbar('Share Stream', msg, snackPosition: SnackPosition.BOTTOM,
         duration: const Duration(seconds: 4));
   }
 
-  // ─── Event handlers ──────────────────────────────────────────
   void _onConnectionStatus(AgoraConnectionStatus s) {
     switch (s) {
       case AgoraConnectionStatus.connecting:
@@ -164,7 +151,7 @@ class HostLiveController extends GetxController {
       case AgoraConnectionStatus.connected:
         streamStatus.value = StreamStatus.live;
         _timer.onStartTimer();
-        // Auto-start RTMP restreaming when Agora is live
+        // Once Agora is live, push to the external RTMP platform.
         _startRtmpIfConfigured();
         break;
       case AgoraConnectionStatus.reconnecting:

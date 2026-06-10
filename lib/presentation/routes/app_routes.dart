@@ -7,7 +7,6 @@ import '../audience_live/audience_live_screen.dart';
 import '../bindings/app_bindings.dart';
 import '../../core/constants/app_constants.dart';
 
-/// Centralised route table
 class AppRoutes {
   AppRoutes._();
 

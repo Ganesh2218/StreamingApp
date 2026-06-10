@@ -1,42 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// LiveHub Design System – Material 3 dark-first streaming theme
 class AppTheme {
   AppTheme._();
 
-  // ─── Brand Colours ──────────────────────────────────────────
-  static const Color primaryColor = Color(0xFFFF2D55);       // TikTok-ish red-pink
-  static const Color secondaryColor = Color(0xFF6C63FF);     // Purple accent
-  static const Color accentColor = Color(0xFF00D2FF);        // Cyan highlight
-  static const Color liveRedColor = Color(0xFFFF3B30);       // Live badge red
-  static const Color successColor = Color(0xFF34C759);       // Success green
-  static const Color warningColor = Color(0xFFFF9500);       // Warning orange
-  static const Color errorColor = Color(0xFFFF3B30);         // Error red
+  static const Color primaryColor = Color(0xFFFF2D55);
+  static const Color secondaryColor = Color(0xFF6C63FF);
+  static const Color accentColor = Color(0xFF00D2FF);
+  static const Color liveRedColor = Color(0xFFFF3B30);
+  static const Color successColor = Color(0xFF34C759);
+  static const Color warningColor = Color(0xFFFF9500);
+  static const Color errorColor = Color(0xFFFF3B30);
 
   static const Duration animDurationFast = Duration(milliseconds: 200);
   static const Duration animDurationMed = Duration(milliseconds: 350);
   static const Duration animDurationSlow = Duration(milliseconds: 600);
 
-  // ─── Dark Surface Palette ───────────────────────────────────
   static const Color darkBg = Color(0xFF0A0A0F);
   static const Color darkSurface = Color(0xFF12121A);
   static const Color darkCard = Color(0xFF1A1A2E);
   static const Color darkBorder = Color(0xFF2A2A3E);
   static const Color darkDivider = Color(0xFF1E1E30);
 
-  // ─── Text on Dark ───────────────────────────────────────────
   static const Color textPrimary = Color(0xFFFFFFFF);
   static const Color textSecondary = Color(0xFFB0B0CC);
   static const Color textTertiary = Color(0xFF6B6B8A);
   static const Color textDisabled = Color(0xFF3D3D5C);
 
-  // ─── Light Surface Palette ──────────────────────────────────
   static const Color lightBg = Color(0xFFF5F5FA);
   static const Color lightSurface = Color(0xFFFFFFFF);
   static const Color lightCard = Color(0xFFFFFFFF);
 
-  // ─── Gradients ──────────────────────────────────────────────
   static const LinearGradient primaryGradient = LinearGradient(
     colors: [Color(0xFFFF2D55), Color(0xFFFF6B35)],
     begin: Alignment.topLeft,
@@ -66,7 +60,6 @@ class AppTheme {
     radius: 0.8,
   );
 
-  // ─── Dark Theme ─────────────────────────────────────────────
   static ThemeData get darkTheme {
     final base = ThemeData.dark(useMaterial3: true);
     return base.copyWith(
@@ -173,7 +166,6 @@ class AppTheme {
     );
   }
 
-  // ─── Light Theme ────────────────────────────────────────────
   static ThemeData get lightTheme {
     final base = ThemeData.light(useMaterial3: true);
     return base.copyWith(
@@ -192,7 +184,6 @@ class AppTheme {
     );
   }
 
-  // ─── Text Theme Builder ─────────────────────────────────────
   static TextTheme _buildTextTheme({required bool isLight}) {
     final bodyColor = isLight ? const Color(0xFF0A0A1A) : textPrimary;
     final subColor = isLight ? const Color(0xFF4A4A6A) : textSecondary;

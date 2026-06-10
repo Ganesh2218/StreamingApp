@@ -1,275 +1,92 @@
-# LiveHub 🔴
+# LiveHub
 
-> **Production-ready Flutter live streaming application** powered by Agora RTC and RTMP/CDN restreaming.  
-> Stream to YouTube Live, Facebook Live, or any custom RTMP endpoint — simultaneously.
+A Flutter live streaming app built with **Agora**. A host can go live, an audience can watch, and the same stream can be pushed to YouTube, Facebook, or any RTMP platform at the same time.
 
----
+## Features
 
-## ✨ Features
+- Host go live (camera + mic) using Agora
+- Audience join and watch a live stream
+- Host end live, with a clear "Stream has ended" message for viewers
+- Restream to YouTube / Facebook / custom RTMP (Agora Media Push)
+- Mic, camera, and flip-camera controls
+- Live viewer count, network quality, and stream timer
+- Dark streaming UI with audience chat
 
-| Feature | Details |
-|---|---|
-| 🔴 **Live Streaming** | Agora RTC broadcaster role with HD video |
-| 📡 **RTMP Restreaming** | YouTube, Facebook, or custom RTMP destination |
-| 👥 **Audience View** | Remote video rendering + live chat UI |
-| 🎙 **Mic & Camera Controls** | Toggle, mute, flip camera on-the-fly |
-| 📊 **Network Quality** | Real-time signal quality indicator |
-| ⏱ **Live Timer** | Streaming duration stopwatch |
-| 👁 **Viewer Count** | Live audience size from Agora events |
-| 💬 **Chat UI** | Audience-side chat (seeded demo data) |
-| 🌑 **Dark Theme** | TikTok/YouTube-style dark streaming UI |
-| 🏗 **Clean Architecture** | Domain → Data → Presentation layers |
+## Requirements
 
----
+- Flutter 3.6 or newer
+- A free Agora account: https://console.agora.io
 
-## 📁 Project Structure
+## Setup
 
-```
-lib/
-├── core/
-│   ├── constants/
-│   │   ├── app_constants.dart     # Routes, keys, RTMP presets
-│   │   └── agora_config.dart      # Agora engine configuration
-│   ├── services/
-│   │   ├── agora_service.dart     # Agora RTC engine wrapper (GetxService)
-│   │   └── storage_service.dart   # Local persistence (GetStorage)
-│   ├── theme/
-│   │   └── app_theme.dart         # Dark + light Material 3 themes
-│   ├── utils/
-│   │   ├── app_utils.dart         # Duration/viewer count formatting
-│   │   └── permission_utils.dart  # Camera/mic permission helpers
-│   └── widgets/
-│       ├── live_badge.dart        # Animated pulsing LIVE badge
-│       ├── viewer_count_widget.dart
-│       ├── network_quality_widget.dart
-│       └── streaming_timer.dart
-│
-├── data/
-│   ├── datasource/
-│   │   └── local_stream_datasource.dart  # GetStorage datasource + seed data
-│   ├── models/
-│   │   ├── user_model.dart        # User with role (host/audience)
-│   │   └── stream_model.dart      # Stream config + live status
-│   └── repositories/
-│       └── stream_repository_impl.dart
-│
-├── domain/
-│   ├── repositories/
-│   │   └── stream_repository.dart # Abstract contracts
-│   └── usecases/
-│       └── stream_usecases.dart   # Single-responsibility use cases
-│
-├── presentation/
-│   ├── auth/                      # Login + role selection
-│   ├── home/                      # Live stream discovery grid
-│   ├── create_live/               # Stream config form
-│   ├── host_live/                 # Broadcaster screen (Agora + RTMP)
-│   ├── audience_live/             # Viewer screen
-│   ├── bindings/                  # GetX dependency bindings
-│   └── routes/                    # Centralised route table
-│
-└── main.dart                      # Entry point, service boot
-```
-
----
-
-## 🚀 Quick Start
-
-### 1. Prerequisites
-
-- Flutter `>=3.6.0`
-- Dart `>=3.6.0`
-- An [Agora](https://console.agora.io) account (free tier includes 10,000 minutes/month)
-
-### 2. Clone & Install
+### 1. Install packages
 
 ```bash
-git clone <your-repo-url>
-cd livehub
 flutter pub get
 ```
 
-### 3. Configure Agora App ID
+### 2. Add your Agora App ID and token
 
-Open `lib/core/constants/app_constants.dart` and replace:
+Open `lib/core/constants/app_constants.dart` and set:
 
 ```dart
-static const String agoraAppId = 'YOUR_AGORA_APP_ID_HERE';
+static const String agoraAppId = 'YOUR_APP_ID';
+static const String agoraToken = 'YOUR_TEMP_TOKEN';
 ```
 
-with your actual App ID from [console.agora.io](https://console.agora.io).
+- **App ID**: Agora Console → your project → Basic Settings → App ID.
+- **Temp Token**: Agora Console → Security → **Generate Temp Token**. When it asks for a channel name, enter `testchannel` (it must match `testChannelName` in the same file). The token lasts about 24 hours.
 
-> ⚠️ **Never commit your App ID to a public repo.** Use environment variables or a secrets manager in production.
+> The test channel is fixed in this build. Host and audience both use `testchannel`, and it must match the channel the token was generated for.
 
-### 4. Run the App
+### 3. Run
 
 ```bash
-# Android
-flutter run
-
-# iOS (requires macOS + Xcode)
-cd ios && pod install && cd ..
 flutter run
 ```
 
----
+Use two devices: one as host, one as audience. A real phone is best for the host (emulators have no real camera).
 
-## 🎙 Agora Setup Guide
+## How to test
 
-### Step 1 — Create a Project
+1. **Host device**: tap Go Live → Setup Stream → leave RTMP fields empty → Start Streaming. You should see your own camera.
+2. **Audience device**: tap the **TEST – Join My Live Channel** tile, or type `testchannel` in the search box and tap the join icon.
+3. The audience now sees the host's video.
+4. When the host ends the stream, the audience screen shows **"Stream has ended"**.
 
-1. Sign in at [console.agora.io](https://console.agora.io)
-2. Click **Create New Project**
-3. Select **Secured mode** (token) for production, or **Testing mode** for development
-4. Copy the **App ID**
+## RTMP restreaming (YouTube / Facebook)
 
-### Step 2 — Enable Media Push (RTMP)
+This part needs a **billing-enabled** Agora account with **Media Push** turned on (it is not free).
 
-1. In your project → **Extensions**
-2. Enable **Media Push**
-3. This allows `startRtmpStreamWithoutTranscoding()` to function
+1. Agora Console → your project → enable **Media Push**.
+2. In Setup Stream, choose a platform and enter the RTMP URL + stream key:
+   - YouTube: `rtmp://a.rtmp.youtube.com/live2/` + your stream key
+   - Facebook: `rtmps://live-api-s.facebook.com:443/rtmp/` + your stream key
+3. Go live. The stream auto-pushes to the platform and stops when you end the live.
 
-### Step 3 — Token Server (Production)
+Instagram has no public RTMP endpoint, so it only works through a relay service (for example Restream.io).
 
-For production apps, deploy a token server. Agora provides reference implementations:
-
-```
-https://github.com/AgoraIO-Community/agora-token-service
-```
-
-Update `AgoraConfig.tokenServerUrl` with your server URL.
-
----
-
-## 📡 RTMP Restreaming Workflow
+## Project structure
 
 ```
-Host presses "Go Live"
-       │
-       ▼
-Agora channel joined (WebRTC)
-       │
-       ▼
-onJoinChannelSuccess fires
-       │
-       ▼
-startRtmpStreamWithoutTranscoding(url) called
-       │
-       ▼
-onRtmpStreamingStateChanged → Running
-       │
-       ├── Host UI: "RTMP Connected ✓"
-       └── Viewers on YouTube/Facebook see the stream
+lib/
+├── core/          App constants, Agora service, theme, utils, shared widgets
+├── data/          Models, local datasource, repository
+├── domain/        Repository contracts and use cases
+└── presentation/  Auth, home, create live, host live, audience live screens
 ```
 
-### RTMP URL Format
+## Main packages
 
-| Platform | Base URL |
+| Package | Use |
 |---|---|
-| YouTube Live | `rtmp://a.rtmp.youtube.com/live2/` |
-| Facebook Live | `rtmps://live-api-s.facebook.com:443/rtmp/` |
-| Custom | Any valid `rtmp://` or `rtmps://` endpoint |
+| agora_rtc_engine | Video, audio, and RTMP push |
+| get | State management, routing, dependency injection |
+| get_storage | Local storage |
+| permission_handler | Camera and mic permissions |
+| wakelock_plus | Keep the screen on while live |
 
-The full push URL = **Base URL** + **Stream Key**  
-e.g. `rtmp://a.rtmp.youtube.com/live2/xxxx-xxxx-xxxx-xxxx`
+## Notes
 
----
-
-## 📱 Platform Configuration
-
-### Android
-
-- **Min SDK:** 21 (required by Agora)
-- **Permissions:** Camera, Microphone, Internet, Wake Lock (all in `AndroidManifest.xml`)
-- **ProGuard:** Rules in `android/app/proguard-rules.pro`
-
-### iOS
-
-- **Min iOS:** 12.0
-- **Permissions:** NSCameraUsageDescription, NSMicrophoneUsageDescription, NSLocalNetworkUsageDescription (all in `Info.plist`)
-- **Background Modes:** `audio`, `voip` (required for streams to continue when backgrounded)
-- **ATS:** `NSAllowsArbitraryLoads = true` (required for plain RTMP; remove for RTMPS-only)
-
-```bash
-# After pub get on iOS
-cd ios
-pod install
-cd ..
-```
-
----
-
-## 🎨 Design System
-
-| Token | Value | Usage |
-|---|---|---|
-| `primaryColor` | `#FF2D55` | Live badge, CTAs, gradients |
-| `secondaryColor` | `#6C63FF` | Purple accents, avatars |
-| `accentColor` | `#00D2FF` | Cyan highlights, info badges |
-| `darkBg` | `#0A0A0F` | Main background |
-| `darkCard` | `#1A1A2E` | Card / input surfaces |
-| `successColor` | `#34C759` | RTMP Connected state |
-| `warningColor` | `#FF9500` | RTMP Connecting state |
-| `errorColor` | `#FF3B30` | Errors, End Live button |
-
-Typography is served by `google_fonts` (Inter family) — no font files to bundle.
-
----
-
-## ⚡ Key Dependencies
-
-| Package | Purpose |
-|---|---|
-| `agora_rtc_engine ^6.3` | Agora RTC (video, audio, RTMP push) |
-| `get ^4.6` | State management, routing, DI |
-| `get_storage ^2.1` | Local storage (streams, user) |
-| `permission_handler ^11` | Runtime camera/mic permissions |
-| `wakelock_plus ^1.2` | Keep screen on during broadcast |
-| `stop_watch_timer ^3.2` | Streaming duration timer |
-| `flutter_animate ^4.5` | Smooth UI micro-animations |
-| `google_fonts ^6.2` | Inter font via network |
-| `equatable ^2.0` | Value equality for models |
-| `uuid ^4.5` | Channel ID generation |
-
----
-
-## 🔐 Security Notes
-
-1. **App ID** — Treat like a password. Use token auth in production.
-2. **Stream Key** — Shown masked in the UI. Never log it.
-3. **Token** — Tokens expire. Implement refresh logic for production via your token server.
-4. **RTMP** — Plain RTMP is unencrypted. Prefer `rtmps://` (Facebook, custom) where available.
-
----
-
-## 🛠 Error Handling
-
-| Scenario | UI Response |
-|---|---|
-| Camera/mic denied | Snackbar with "Open Settings" button |
-| Invalid RTMP URL | Inline form validation + snackbar |
-| Agora join failed | Status → `Failed`, snackbar with retry hint |
-| RTMP push failed | `RTMP Failed ✗` chip + snackbar with error code |
-| Network drop | Status → `Reconnecting`, auto-reconnect by Agora |
-| Token expired | `errInvalidToken` → status `Failed`, prompt re-auth |
-
----
-
-## 🏗 Architecture Decisions
-
-- **Clean Architecture** — Domain layer has zero Flutter/platform dependencies. Business logic is fully testable.
-- **Repository Pattern** — `StreamRepository` abstract interface separates domain from data. Swap local storage for a Firebase/Supabase implementation by providing a new `StreamRepository` implementation.
-- **GetX** — Chosen for unified state management + routing + DI with minimal boilerplate, ideal for real-time reactive streaming data.
-- **Permanent Services** — `AgoraService` and `StorageService` are registered as `permanent: true` so they survive screen navigation.
-
----
-
-## 📄 License
-
-MIT — free for personal and commercial use.
-
----
-
-*Built with Flutter and ❤️ by the LiveHub team*
-#   S t r e a m i n g A p p  
- 
+- App ID and tokens are secrets. Use a token server in production instead of a static temp token.
+- For production, set `useTestChannel = false` in `app_constants.dart` so each stream gets its own channel.

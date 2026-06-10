@@ -1,10 +1,10 @@
 import 'package:get/get.dart';
-import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import '../../core/services/agora_service.dart';
 import '../../core/services/storage_service.dart';
 import '../../data/models/stream_model.dart';
-import '../../core/constants/app_constants.dart';
 
+/// Drives the audience screen: joins the host's channel, tracks viewer
+/// count, and detects when the stream ends.
 class AudienceLiveController extends GetxController {
   late final AgoraService _agora;
   late final StorageService _storage;
@@ -16,6 +16,10 @@ class AudienceLiveController extends GetxController {
   final showControls = true.obs;
   final chatMessages = <_ChatMessage>[].obs;
   final viewerCount = 0.obs;
+
+  // True once the host has joined and then left, i.e. the stream ended.
+  final hasEnded = false.obs;
+  bool _hadHost = false;
 
   AgoraService get agora => _agora;
   RxList<int> get remoteUsers => _agora.remoteUsers;
@@ -29,10 +33,21 @@ class AudienceLiveController extends GetxController {
 
     ever(_agora.viewerCount, (v) => viewerCount.value = v);
 
+    // Watch the host: present means live, gone after present means ended.
+    ever(_agora.remoteUsers, (List<int> users) {
+      if (users.isNotEmpty) {
+        _hadHost = true;
+        hasEnded.value = false;
+      } else if (_hadHost) {
+        hasEnded.value = true;
+      }
+    });
+
     _joinChannel();
     _seedChatMessages();
   }
 
+  /// Joins the host's channel as a viewer.
   Future<void> _joinChannel() async {
     if (stream == null) return;
     try {

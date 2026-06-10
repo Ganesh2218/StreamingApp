@@ -1,27 +1,28 @@
-/// App-wide constants for LiveHub streaming platform
 class AppConstants {
   AppConstants._();
 
-  // ─── App Info ───────────────────────────────────────────────
   static const String appName = 'LiveHub';
   static const String appVersion = '1.0.0';
   static const String packageName = 'com.livehub';
 
-  // ─── Agora ──────────────────────────────────────────────────
-  /// Replace with your actual Agora App ID from console.agora.io
-  static const String agoraAppId = '70fcbedcbdc24418b24636289d80bbf2';
+  /// Agora App ID from console.agora.io.
+  static const String agoraAppId = 'd03337784ffe4bac8a1b53646e3153fa';
 
-  /// Set to empty string '' to disable token auth (testing only).
-  /// In production always use a token server.
-  static const String agoraToken = '';
+  /// Temp token bound to [testChannelName], used for testing.
+  static const String agoraToken =
+      '007eJxTYLjs3Btjym/JFs5m9H9u0sfqt9LZS475xHaen7+4OeNTKYMCQ4qBsbGxubmFSVpaqklSYrJFomGSqbGZiVmqsaGpcVri1w8aWQ2BjAxyU/8zMEIhiM/NUJJaXJKckZiXl5rDwAAAAh4iYQ==';
 
-  // ─── Storage Keys ────────────────────────────────────────────
+  /// Fixed channel host and audience join while testing with the temp token.
+  static const String testChannelName = 'testchannel';
+
+  /// When true, Create Live pre-fills [testChannelName] instead of a random one.
+  static const bool useTestChannel = true;
+
   static const String keyUser = 'livehub_user';
   static const String keyStreams = 'livehub_streams';
   static const String keyThemeMode = 'livehub_theme_mode';
   static const String keyStreamConfigs = 'livehub_stream_configs';
 
-  // ─── Route Names ────────────────────────────────────────────
   static const String routeSplash = '/';
   static const String routeAuth = '/auth';
   static const String routeHome = '/home';
@@ -29,7 +30,6 @@ class AppConstants {
   static const String routeHostLive = '/host-live';
   static const String routeAudienceLive = '/audience-live';
 
-  // ─── UI ──────────────────────────────────────────────────────
   static const double borderRadiusSm = 8.0;
   static const double borderRadiusMd = 12.0;
   static const double borderRadiusLg = 20.0;
@@ -39,13 +39,11 @@ class AppConstants {
   static const Duration animDurationMed = Duration(milliseconds: 350);
   static const Duration animDurationSlow = Duration(milliseconds: 600);
 
-  // ─── Stream Defaults ─────────────────────────────────────────
   static const int defaultVideoWidth = 1280;
   static const int defaultVideoHeight = 720;
   static const int defaultFrameRate = 30;
-  static const int defaultBitrate = 3000; // kbps
+  static const int defaultBitrate = 3000;
 
-  // ─── RTMP Presets ────────────────────────────────────────────
   static const String youtubeLiveRtmpBase = 'rtmp://a.rtmp.youtube.com/live2/';
   static const String facebookLiveRtmpBase =
       'rtmps://live-api-s.facebook.com:443/rtmp/';

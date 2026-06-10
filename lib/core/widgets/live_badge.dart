@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../theme/app_theme.dart';
 
-/// Pulsing "LIVE" badge shown on streams
 class LiveBadge extends StatelessWidget {
   final bool compact;
   const LiveBadge({super.key, this.compact = false});

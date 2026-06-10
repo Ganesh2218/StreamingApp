@@ -1,9 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-/// Streaming platform presets for RTMP push
 enum StreamPlatform { youtube, facebook, custom }
 
-/// Live stream lifecycle status
 enum StreamStatus {
   offline,
   connecting,
@@ -14,7 +12,6 @@ enum StreamStatus {
   ended,
 }
 
-/// Extension to get human-readable labels for StreamStatus
 extension StreamStatusLabel on StreamStatus {
   String get label {
     switch (this) {
@@ -36,7 +33,6 @@ extension StreamStatusLabel on StreamStatus {
   }
 }
 
-/// Full stream configuration and live state model
 class StreamModel extends Equatable {
   final String id;
   final String title;
@@ -76,7 +72,6 @@ class StreamModel extends Equatable {
 
   bool get isLive => status == StreamStatus.live || status == StreamStatus.rtmpConnected;
 
-  /// Full RTMP push URL
   String get fullRtmpUrl {
     if (rtmpServerUrl.isEmpty || streamKey.isEmpty) return '';
     final base = rtmpServerUrl.endsWith('/') ? rtmpServerUrl : '$rtmpServerUrl/';

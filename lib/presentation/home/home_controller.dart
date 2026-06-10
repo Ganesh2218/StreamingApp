@@ -29,7 +29,6 @@ class HomeController extends GetxController {
     currentUser.value = _storage.getUser();
     loadStreams();
 
-    // Filter reactively as searchQuery changes
     debounce(searchQuery, (_) => _applyFilter(),
         time: const Duration(milliseconds: 300));
   }
@@ -52,7 +51,8 @@ class HomeController extends GetxController {
       filteredStreams.value = allStreams.where((s) {
         return s.title.toLowerCase().contains(q) ||
             s.hostName.toLowerCase().contains(q) ||
-            s.description.toLowerCase().contains(q);
+            s.description.toLowerCase().contains(q) ||
+            s.channelName.toLowerCase().contains(q);
       }).toList();
     }
   }
@@ -67,6 +67,25 @@ class HomeController extends GetxController {
   }
 
   void navigateToAudienceLive(StreamModel stream) {
+    Get.toNamed(AppConstants.routeAudienceLive, arguments: stream);
+  }
+
+  /// Join any channel directly by name, bypassing stream discovery.
+  void joinByChannel(String channelName) {
+    final name = channelName.trim();
+    if (name.isEmpty) {
+      Get.snackbar('Enter a channel', 'Type the channel name to join.',
+          snackPosition: SnackPosition.BOTTOM);
+      return;
+    }
+    final stream = StreamModel(
+      id: 'manual-$name',
+      title: 'Live • $name',
+      channelName: name,
+      hostId: 'host',
+      hostName: 'Host',
+      status: StreamStatus.live,
+    );
     Get.toNamed(AppConstants.routeAudienceLive, arguments: stream);
   }
 

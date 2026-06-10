@@ -42,14 +42,12 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
-  // ─── App Bar ────────────────────────────────────────────────
   Widget _buildAppBar(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
         child: Row(
           children: [
-            // Logo
             Container(
               width: 38,
               height: 38,
@@ -77,19 +75,27 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
-  // ─── Search Bar ─────────────────────────────────────────────
   Widget _buildSearchBar() {
     return SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
         child: TextField(
           onChanged: controller.onSearchChanged,
+          textInputAction: TextInputAction.go,
+          onSubmitted: controller.joinByChannel,
           style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
           decoration: InputDecoration(
-            hintText: 'Search streams, creators…',
+            hintText: 'Search, or type a channel to join…',
             hintStyle: const TextStyle(color: AppTheme.textTertiary, fontSize: 14),
             prefixIcon: const Icon(Icons.search_rounded,
                 color: AppTheme.textTertiary, size: 20),
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.login_rounded,
+                  color: AppTheme.primaryColor, size: 20),
+              tooltip: 'Join channel',
+              onPressed: () =>
+                  controller.joinByChannel(controller.searchQuery.value),
+            ),
             filled: true,
             fillColor: AppTheme.darkCard,
             contentPadding: const EdgeInsets.symmetric(vertical: 12),
@@ -111,7 +117,6 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
-  // ─── Featured Section ────────────────────────────────────────
   Widget _buildFeaturedSection(BuildContext context) {
     return SliverToBoxAdapter(
       child: Obx(() {
@@ -151,7 +156,6 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
-  // ─── Live Section Header ─────────────────────────────────────
   Widget _buildLiveSectionHeader(BuildContext context) {
     return SliverToBoxAdapter(
       child: Obx(() => Padding(
@@ -175,7 +179,6 @@ class HomeScreen extends GetView<HomeController> {
     );
   }
 
-  // ─── Stream Grid ─────────────────────────────────────────────
   Widget _buildStreamGrid(BuildContext context) {
     return Obx(() {
       if (controller.isLoading.value) {
@@ -293,7 +296,6 @@ class HomeScreen extends GetView<HomeController> {
   }
 }
 
-// ─── Featured Card ────────────────────────────────────────────
 class _FeaturedCard extends StatelessWidget {
   final StreamModel stream;
   final VoidCallback onTap;
@@ -367,7 +369,6 @@ class _FeaturedCard extends StatelessWidget {
   }
 }
 
-// ─── Stream Grid Card ─────────────────────────────────────────
 class _StreamCard extends StatelessWidget {
   final StreamModel stream;
   final int index;
@@ -422,7 +423,6 @@ class _StreamCard extends StatelessWidget {
                   ViewerCountWidget(count: stream.viewerCount, compact: true),
                 ]),
                 const Spacer(),
-                // Avatar + Name
                 Row(children: [
                   _HostAvatar(name: stream.hostName, size: 24),
                   const SizedBox(width: 6),
@@ -457,7 +457,6 @@ class _StreamCard extends StatelessWidget {
   }
 }
 
-// ─── Supporting Widgets ───────────────────────────────────────
 class _AvatarButton extends StatelessWidget {
   final String name;
   final VoidCallback onTap;

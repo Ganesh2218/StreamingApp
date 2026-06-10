@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Monospace streaming timer display for host live screen
 class StreamingTimer extends StatelessWidget {
   final String elapsed;
   const StreamingTimer({super.key, required this.elapsed});

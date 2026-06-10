@@ -1,9 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-/// User roles within LiveHub
 enum UserRole { host, audience }
 
-/// Immutable user model used across layers
 class UserModel extends Equatable {
   final String id;
   final String name;

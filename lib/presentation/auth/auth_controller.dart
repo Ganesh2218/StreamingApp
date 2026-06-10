@@ -20,7 +20,7 @@ class AuthController extends GetxController {
       return;
     }
     isLoading.value = true;
-    await Future.delayed(const Duration(milliseconds: 800)); // Simulate network
+    await Future.delayed(const Duration(milliseconds: 800));
     final user = UserModel(
       id: 'user-${DateTime.now().millisecondsSinceEpoch}',
       name: name.trim(),

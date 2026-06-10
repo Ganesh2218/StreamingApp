@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../utils/app_utils.dart';
 
-/// Displays viewer count with eye icon. Supports compact mode for overlays.
 class ViewerCountWidget extends StatelessWidget {
   final int count;
   final bool compact;

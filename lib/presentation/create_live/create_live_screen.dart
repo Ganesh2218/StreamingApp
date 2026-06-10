@@ -44,7 +44,6 @@ class CreateLiveScreen extends GetView<CreateLiveController> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Platform selector
                 const _SectionLabel('Streaming Platform'),
                 const SizedBox(height: 10),
                 Obx(() => _PlatformSelector(
@@ -78,10 +77,9 @@ class CreateLiveScreen extends GetView<CreateLiveController> {
                 _StreamField(
                   controller: controller.channelController,
                   label: 'Channel Name',
-                  hint: 'Auto-generated unique channel ID',
+                  hint: 'Fixed channel for this build',
                   icon: Icons.settings_ethernet_rounded,
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Channel name required' : null,
+                  readOnly: true,
                 ),
                 const SizedBox(height: 8),
                 Container(
@@ -98,7 +96,7 @@ class CreateLiveScreen extends GetView<CreateLiveController> {
                     const SizedBox(width: 8),
                     const Expanded(
                       child: Text(
-                        'Audience joins via this channel name. Keep it unique.',
+                        'Audience joins on this channel. It matches the Agora token.',
                         style: TextStyle(
                             color: AppTheme.accentColor,
                             fontSize: 12),
@@ -158,7 +156,6 @@ class CreateLiveScreen extends GetView<CreateLiveController> {
                 ),
                 const SizedBox(height: 36),
 
-                // Start Live
                 Obx(() => _GradientGoLiveButton(
                       isLoading: controller.isLoading.value,
                       onTap: () => controller.startLive(formKey),
@@ -173,7 +170,6 @@ class CreateLiveScreen extends GetView<CreateLiveController> {
   }
 }
 
-// ─── Platform Selector ────────────────────────────────────────
 class _PlatformSelector extends StatelessWidget {
   final StreamPlatform selected;
   final void Function(StreamPlatform) onSelect;
@@ -253,7 +249,6 @@ class _PlatformChip extends StatelessWidget {
   }
 }
 
-// ─── Helpers ─────────────────────────────────────────────────
 class _SectionLabel extends StatelessWidget {
   final String text;
   const _SectionLabel(this.text);
@@ -275,6 +270,7 @@ class _StreamField extends StatelessWidget {
   final IconData icon;
   final int maxLines;
   final bool obscureText;
+  final bool readOnly;
   final Widget? suffixIcon;
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
@@ -286,6 +282,7 @@ class _StreamField extends StatelessWidget {
     required this.icon,
     this.maxLines = 1,
     this.obscureText = false,
+    this.readOnly = false,
     this.suffixIcon,
     this.keyboardType = TextInputType.text,
     this.validator,
@@ -297,6 +294,7 @@ class _StreamField extends StatelessWidget {
       controller: controller,
       maxLines: maxLines,
       obscureText: obscureText,
+      readOnly: readOnly,
       keyboardType: keyboardType,
       style: const TextStyle(color: AppTheme.textPrimary, fontSize: 14),
       validator: validator,

@@ -11,27 +11,24 @@ Future<void> main() async {
   try {
     WidgetsFlutterBinding.ensureInitialized();
 
-    // ── Boot services in order ───────────────────────────────────
+    // Local storage is required, so register it first.
     final storage = StorageService();
     await storage.init();
     Get.put<StorageService>(storage, permanent: true);
 
-    // Pre-warm Agora engine (with error handling for Web safety)
+    // Warm up the Agora engine, but don't crash the app if it fails.
     try {
       final agora = AgoraService();
       await agora.init();
       Get.put<AgoraService>(agora, permanent: true);
     } catch (e) {
       debugPrint('[Main] Agora pre-warm failed: $e');
-      // We don't crash the whole app if Agora fails to pre-warm; 
-      // the controller can try again later or show an error.
     }
 
     runApp(const LiveHubApp());
   } catch (e, stack) {
     debugPrint('[Main] Fatal initialization error: $e');
     debugPrint(stack.toString());
-    // Fallback app to show the error if everything fails
     runApp(MaterialApp(
       home: Scaffold(
         body: Center(child: Text('Fatal Error: $e')),
@@ -52,22 +49,14 @@ class LiveHubApp extends StatelessWidget {
     return GetMaterialApp(
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
-
-      // ── Themes ──────────────────────────────────────────────
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: storage.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-
-      // ── Navigation ──────────────────────────────────────────
       initialRoute: initialRoute,
       getPages: AppRoutes.routes,
       defaultTransition: Transition.fadeIn,
-
-      // ── Localisation (placeholder) ───────────────────────────
       locale: const Locale('en', 'US'),
       fallbackLocale: const Locale('en', 'US'),
-
-      // ── Builder: apply edge-to-edge + safe area ──────────────
       builder: (context, child) {
         return MediaQuery(
           data:

@@ -3,7 +3,7 @@ import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:get/get.dart';
 import '../constants/app_constants.dart';
 
-/// Enumerates all possible Agora connection states shown in the Host UI
+/// Connection state of the Agora channel.
 enum AgoraConnectionStatus {
   idle,
   connecting,
@@ -13,7 +13,7 @@ enum AgoraConnectionStatus {
   disconnected,
 }
 
-/// Enumerates RTMP push states
+/// State of the RTMP push to an external platform (YouTube, Facebook, etc.).
 enum RtmpPushStatus {
   idle,
   connecting,
@@ -22,14 +22,12 @@ enum RtmpPushStatus {
   stopped,
 }
 
-/// Manages Agora RTC engine lifecycle, channel joining, RTMP push,
-/// and exposes reactive state for UI consumption via GetX.
+/// Wraps the Agora engine: joining as host/audience, camera/mic controls,
+/// and RTMP restreaming. Exposes reactive state for the UI.
 class AgoraService extends GetxService {
-  // ─── Engine ──────────────────────────────────────────────────
   RtcEngine? _engine;
   RtcEngine get engine => _engine!;
 
-  // ─── Observable State ────────────────────────────────────────
   final connectionStatus = AgoraConnectionStatus.idle.obs;
   final rtmpStatus = RtmpPushStatus.idle.obs;
   final rtmpErrorCode = 0.obs;
@@ -37,17 +35,16 @@ class AgoraService extends GetxService {
   final localAudioEnabled = true.obs;
   final isFrontCamera = true.obs;
   final remoteUsers = <int>[].obs;
-  final networkQuality = 0.obs; // 0-6: excellent to down
+  final networkQuality = 0.obs;
   final viewerCount = 0.obs;
   final isInitialized = false.obs;
 
-  // ─── Callbacks exposed for controllers ───────────────────────
   Function(int uid, int elapsed)? onUserJoined;
   Function(int uid, UserOfflineReasonType reason)? onUserOffline;
   Function(RtmpStreamPublishState state, dynamic error)?
       onRtmpStatusChanged;
 
-  // ─── Init ────────────────────────────────────────────────────
+  /// Creates and initializes the Agora engine. Called once at app start.
   Future<AgoraService> init() async {
     await _createEngine();
     isInitialized.value = true;
@@ -65,7 +62,7 @@ class AgoraService extends GetxService {
     _registerEventHandlers();
   }
 
-  // ─── Event Handlers ──────────────────────────────────────────
+  /// Listens to Agora events and updates the reactive state above.
   void _registerEventHandlers() {
     _engine!.registerEventHandler(
       RtcEngineEventHandler(
@@ -121,7 +118,6 @@ class AgoraService extends GetxService {
         },
         onNetworkQuality: (connection, remoteUid, txQuality, rxQuality) {
           if (remoteUid == 0) {
-            // 0 = local user stats
             networkQuality.value = txQuality.index;
           }
         },
@@ -150,7 +146,7 @@ class AgoraService extends GetxService {
     );
   }
 
-  // ─── Host: Join as Broadcaster ──────────────────────────────
+  /// Host joins the channel: publishes camera and mic to viewers.
   Future<void> joinAsBroadcaster(String channelName,
       {String token = ''}) async {
     if (!isInitialized.value) await init();
@@ -184,7 +180,7 @@ class AgoraService extends GetxService {
     await _engine!.startPreview();
   }
 
-  // ─── Audience: Join as Viewer ───────────────────────────────
+  /// Audience joins the channel: watches the host without publishing.
   Future<void> joinAsAudience(String channelName,
       {String token = ''}) async {
     if (!isInitialized.value) await init();
@@ -206,14 +202,13 @@ class AgoraService extends GetxService {
     );
   }
 
-  // ─── Leave Channel ───────────────────────────────────────────
+  /// Leaves the channel and stops the camera preview.
   Future<void> leaveChannel() async {
     await _engine?.stopPreview();
     await _engine?.leaveChannel();
     connectionStatus.value = AgoraConnectionStatus.idle;
   }
 
-  // ─── Camera Controls ─────────────────────────────────────────
   Future<void> toggleCamera() async {
     localVideoEnabled.value = !localVideoEnabled.value;
     await _engine?.muteLocalVideoStream(!localVideoEnabled.value);
@@ -224,13 +219,12 @@ class AgoraService extends GetxService {
     isFrontCamera.value = !isFrontCamera.value;
   }
 
-  // ─── Mic Controls ────────────────────────────────────────────
   Future<void> toggleMic() async {
     localAudioEnabled.value = !localAudioEnabled.value;
     await _engine?.muteLocalAudioStream(!localAudioEnabled.value);
   }
 
-  // ─── RTMP Push ───────────────────────────────────────────────
+  /// Starts pushing the live stream to an external RTMP URL (needs Media Push).
   Future<void> startRtmpPush(String rtmpUrl) async {
     rtmpStatus.value = RtmpPushStatus.connecting;
     try {
@@ -241,6 +235,7 @@ class AgoraService extends GetxService {
     }
   }
 
+  /// Stops the RTMP push to the given URL.
   Future<void> stopRtmpPush(String rtmpUrl) async {
     try {
       await _engine?.stopRtmpStream(rtmpUrl);
@@ -250,7 +245,6 @@ class AgoraService extends GetxService {
     }
   }
 
-  // ─── Cleanup ─────────────────────────────────────────────────
   @override
   void onClose() {
     leaveChannel();
